@@ -1,0 +1,47 @@
+---
+- name: DNS Lookup Play
+  hosts: ansible-ubuntu
+  #connection: local
+  gather_facts: no
+  vars:
+    defaultCount: 10
+  tasks:
+  - name: Get Hosts List
+    tags: first
+    set_fact:
+      hosts_list: "{{ hosts.split(' ') }}"
+
+  - name: Reocrd A lookup
+    shell:
+      cmd: dnsping -s {{ dnsServer }} -c {{ defaultCount }} {{ item }}
+      executable: /bin/bash
+    register: dns_out
+    with_items:
+      - "{{ hosts_list }}"
+
+  - name: Copy Output to File
+    delegate_to: localhost
+    copy:
+      content: "{{ dns_out.results }}"
+      dest: "{{ workspace }}/config/dns_output_{{ dnsServer }}.txt"
+
+  - name: Parse DNS Output Using TextFSM
+    delegate_to: localhost
+    ansible.netcommon.cli_parse:
+      text: "{{ item.stdout }}"
+      parser:
+        name: ansible.netcommon.textfsm
+        os: linux
+        command: dnsping
+    register: parser_output
+    with_items:
+      - "{{ dns_out.results }}"
+    
+  - name: Render DNS Template
+    delegate_to: localhost
+    template: 
+      src: templates/dns_template.j2
+      dest: "{{ workspace }}/config/dns_results_{{ dnsServer }}.csv"
+    vars: 
+      count: "{{ defaultCount }}"
+      responseList: "{{ parser_output.results }}"

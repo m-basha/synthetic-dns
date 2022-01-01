@@ -1,0 +1,17 @@
+Value Required dnsServer (\S+)
+Value Required dnsPort (\d+)
+Value Required host (\S+)
+Value Required protocol (\S+)
+Value Required recordType (\S+)
+Value Required packetsTX (\d+)
+Value Required packetsRD (\d+)
+Value Required lossPerc (\d+)
+Value Required minRespTime (\d+\.\d+|\d+)
+Value Required avgRespTime (\d+\.\d+|\d+)
+Value Required maxRespTime (\d+\.\d+|\d+)
+Value Required jitter (\d+\.\d+|\d+)
+
+Start
+  ^dnsping DNS: ${dnsServer}:${dnsPort}, hostname: ${host}, proto: ${protocol}, rdatatype: ${recordType}, flags:.*
+  ^${packetsTX} requests transmitted, ${packetsRD} responses received, ${lossPerc}% lost
+  ^min=${minRespTime} ms, avg=${avgRespTime} ms, max=${maxRespTime} ms, stddev=${jitter}\sms -> Record

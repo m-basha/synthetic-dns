@@ -1,0 +1,4 @@
+dnsServer,host,count,minRespTime,maxRespTime,avgRespTime,lossPerc%,jitter
+{% for i in (responseList) %}
+{{ i.parsed[0].dnsServer }},{{ i.parsed[0].host }},{{ count }},{{ i.parsed[0].minRespTime }},{{ i.parsed[0].maxRespTime }},{{ i.parsed[0].avgRespTime }},{{ i.parsed[0].lossPerc }},{{ i.parsed[0].jitter }}
+{% endfor %}
